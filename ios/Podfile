@@ -12,6 +12,8 @@ target 'designcode' do
     :hermes_enabled => false
   )
 
+  pod 'RNBoundary', :path => '../node_modules/react-native-boundary'
+
   target 'designcodeTests' do
     inherit! :complete
     # Pods for testing

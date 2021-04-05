@@ -12,7 +12,10 @@
   "dependencies": {
     "react": "17.0.1",
     "react-native": "0.64.0",
-    "react-native-maps": "0.27.1"
+    "react-native-boundary": "^1.1.1",
+    "react-native-geolocation-service": "^5.2.0",
+    "react-native-maps": "0.27.1",
+    "react-native-push-notification": "^7.2.3"
   },
   "devDependencies": {
     "@babel/core": "7.13.14",

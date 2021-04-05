@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "332965203807",
+    "project_id": "prg09-react-native",
+    "storage_bucket": "prg09-react-native.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:332965203807:android:4b2c91c267b4876b6b30ea",
+        "android_client_info": {
+          "package_name": "com.designcode"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "332965203807-3s9ign6367cf9lb39mq4mgkmai0oul5g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUa8q1eDTQ8DMBs6WPa5v7cQZugn5nZFE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "332965203807-3s9ign6367cf9lb39mq4mgkmai0oul5g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
