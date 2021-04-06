@@ -7,3 +7,5 @@ apply from: file("../node_modules/@react-native-community/cli-platform-android/n
 include ':app'
 include ':react-native-push-notification'
 project(':react-native-push-notification').projectDir = file('../node_modules/react-native-push-notification/android')
+include ':react-native-geo-fencing'
+project(':react-native-geo-fencing').projectDir = new File(settingsDir, '../node_modules/react-native-geo-fencing/android')
