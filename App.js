@@ -19,7 +19,7 @@ export default class App extends React.Component {
   constructor() {
     super();
     this.state = {
-        currentLocation: {lat: 52.130363, lng: 4.334120},
+        currentLocation: {lat: 52.127817, lng: 4.336369},
         nextLocation: {lat: 52.128053, lng: 4.333560},
         previousLocation: null,
         isEnter: true,
@@ -73,7 +73,7 @@ export default class App extends React.Component {
     const polygon = [
       { lat: 52.127817, lng: 4.336369 },
       { lat: 52.132933, lng: 4.333433 },
-      { lat: 52.130284, lng: 4.332875 },
+      { lat: 52.130614, lng: 4.333954 },
       { lat: 52.127817, lng: 4.336369 },
     ];
 
@@ -130,18 +130,40 @@ export default class App extends React.Component {
     }
   }
 
+  sleep = (milliseconds) => {
+    return new Promise(resolve => setTimeout(resolve, milliseconds))
+  }
+
+  takeRoute = async () => {
+    for ( let i = 0; i < this.route.length; i++) {
+      this.setState({
+        currentLocation: this.route[i]
+      })
+      this.checkGeoFencing()
+      await this.sleep(5000)
+    }
+  }
+
   onPressHandler = () => {
-    this.setState({
-      currentLocation: this.state.nextLocation
-    })
-    this.checkGeoFencing()
+    this.takeRoute()
   }
 
   polygon = [
     {'latitude': 52.127817, 'longitude': 4.336369,},
     {'latitude': 52.132933, 'longitude': 4.333433,},
-    {'latitude': 52.130284, 'longitude': 4.332875,},
+    {'latitude': 52.130614, 'longitude': 4.333954,},
     {'latitude': 52.127817, 'longitude': 4.336369,}
+  ]
+
+  route = [
+    { lat: 52.127817, lng: 4.336369 },
+    { lat: 52.128214, lng: 4.336098 },
+    { lat: 52.128831, lng: 4.335514 },
+    { lat: 52.128931, lng: 4.335214 }, 
+    { lat: 52.129747, lng: 4.334897 },
+    { lat: 52.131162, lng: 4.334120 },
+    { lat: 52.132098, lng: 4.333956 },
+    { lat: 52.132933, lng: 4.333433 }
   ]
 
   render() {
@@ -159,14 +181,13 @@ export default class App extends React.Component {
             }}>
             {/* On the map: */}
             <Polygon coordinates={this.polygon} strokeWidth={2} strokeColor={'red'}/>
-            <Marker title={'Current location'} coordinate={{ latitude : this.state.currentLocation.lat , longitude : this.state.currentLocation.lng }} />
+            <Marker title={'Current location'} coordinate={{ latitude : this.state.currentLocation.lat, longitude : this.state.currentLocation.lng }} />
             {this.state.hasPreviousLocation ? <Marker title={'Previous location'} coordinate={{ latitude : this.state.previousLocation.lat , longitude : this.state.previousLocation.lng }} /> : null}
           </MapView>
       <View style={styles.content}>
-        <Button onPress={this.onPressHandler} title='Next location'/>
+        <Button onPress={this.onPressHandler} title='Start Route!'/>
         {/* <Button onPress={this.storeData} title='Save location'/>
         <Button onPress={this.getData} title='Load previous locaiton'/> */}
-        <Text>Op het pad : {this.state.isEnter ? 'Ja!' : 'Nee!'}</Text>
       </View>
       </View>
     )
