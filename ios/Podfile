@@ -14,6 +14,8 @@ target 'designcode' do
 
   pod 'RNBoundary', :path => '../node_modules/react-native-boundary'
 
+  pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-async-storage/async-storage'
+
   target 'designcodeTests' do
     inherit! :complete
     # Pods for testing

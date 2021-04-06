@@ -12,6 +12,7 @@ import {StyleSheet, View, Text, Button } from 'react-native';
 import MapView, {PROVIDER_GOOGLE, Marker, Circle, Polygon} from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import PushNotification from "react-native-push-notification";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class App extends React.Component {
   constructor() {
@@ -19,7 +20,9 @@ export default class App extends React.Component {
     this.state = {
         currentLocation: {lat: 52.130363, lng: 4.334120},
         nextLocation: {lat: 52.132933, lng: 4.333433},
-        isEnter: false
+        previousLocation: null,
+        isEnter: false,
+        hasPreviousLocation: false
     }
 
     PushNotification.configure({
@@ -54,15 +57,14 @@ export default class App extends React.Component {
         importance: 4, // (optional) default: 4. Int value of the Android notification importance
         vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
       },
-      (created) => console.log(`createChannel returned '${created}'`) // (optional) callback returns whether the channel was created, false means it already existed.
     );
   }
 
   sendMessage = () => {
     PushNotification.localNotification({
       channelId: "channel-id", 
-      title: "My Notification Title", // (optional)
-      message: "My Notification Message", // (required)
+      title: "Je bent van het pad af gegaan!", // (optional)
+      message: "Keer zo snel mogelijk terug.", // (required)
     });
   }
 
@@ -89,8 +91,29 @@ export default class App extends React.Component {
 
   onPressHandler = () => {
     this.state.isEnter = true
-    console.log("Get next location")
     this.sendMessage()
+  }
+  storeData = async () => {
+    try {
+      console.log('Storing location...')
+      const jsonValue = JSON.stringify(this.state.currentLocation)
+      await AsyncStorage.setItem('location', jsonValue)
+      alert('Location Stored!')
+    } catch (e) {
+      console.warn(e)
+    }
+  }
+  getData = async () => {
+    try {
+      console.log('Getting previous location...')
+      const jsonValue = await AsyncStorage.getItem('location')
+      const data = jsonValue != null ? JSON.parse(jsonValue) : null;
+      this.state.previousLocation = data
+      this.state.hasPreviousLocation = true
+      console.log('Got previous location!')
+    } catch(e) {
+      console.warn(e)
+    }
   }
 
   render() {
@@ -108,10 +131,14 @@ export default class App extends React.Component {
         >
         <Polygon coordinates={this.polygon} strokeWidth={2} strokeColor={'red'}/>
         <Circle center={{latitude: 52.127817, longitude: 4.336369}} radius={50} strokeWidth={2} strokeColor={'red'}/>
-        <Marker coordinate={{ latitude : this.state.currentLocation.lat , longitude : this.state.currentLocation.lng }} />
+        <Marker title={'Current location'} coordinate={{ latitude : this.state.currentLocation.lat , longitude : this.state.currentLocation.lng }} />
+        {this.state.hasPreviousLocation ? <Marker title={'Previous location'} coordinate={{ latitude : this.state.previousLocation.lat , longitude : this.state.previousLocation.lng }} /> : null}
       </MapView>
       <View style={styles.content}>
+
         <Button onPress={this.onPressHandler} title='Next location'/>
+        <Button onPress={this.storeData} title='Save location'/>
+        <Button onPress={this.getData} title='Load previous locaiton'/>
         <Text>Boundary entered : {this.state.isEnter ? 'Enter' : 'Not Enter'}</Text>
       </View>
       </View>
