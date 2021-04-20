@@ -7,7 +7,7 @@
  */
 
 import React from 'react';
-import {StyleSheet, View, Text, Button } from 'react-native';
+import {StyleSheet, View, Text, Button, PermissionsAndroid, AppState } from 'react-native';
 
 import MapView, {PROVIDER_GOOGLE, Marker, Polygon} from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
@@ -23,8 +23,9 @@ export default class App extends React.Component {
         nextLocation: {lat: 52.128053, lng: 4.333560},
         previousLocation: null,
         isEnter: true,
-        hasPreviousLocation: false
-    }
+        hasPreviousLocation: false,
+        appState: AppState.currentState    
+      }
 
     // Pushnotification configure settings
     PushNotification.configure({
@@ -59,6 +60,69 @@ export default class App extends React.Component {
       },
     );
   }
+
+  componentDidMount() {
+    this.requestLocationPermission()
+
+    // See if AppState changes and if so run function
+    AppState.addEventListener("change", this._handleAppStateChange);
+  }
+
+  componentWillUnmount() {
+    // See if AppState changes and if so run function
+    AppState.removeEventListener("change", this._handleAppStateChange);
+
+    // if App is in the background it will schedule an notification
+    console.warn('I Unmounted!')
+    if(this.state.appState === 'background') {
+      PushNotification.localNotificationSchedule({
+        channelId: "channel-id",
+        message: "Niet vergeten om op het pad te blijven he!", // (required)
+        date: new Date(Date.now() + (5 * 1000)), // in 5 secs
+      });
+    }
+  }
+
+  // If appstate changes it will safe new appstate in the state
+  _handleAppStateChange = nextAppState => {
+    if (
+      this.state.appState.match(/inactive|background/) &&
+      nextAppState === "active"
+    ) {
+      console.log("App has come to the foreground!");
+    }
+    this.setState({ appState: nextAppState });
+  };
+
+  // Requesting permission to use location
+  requestLocationPermission = async () => {
+    if (Platform.OS !=='android' )   
+    Geolocation.requestAuthorization()
+    else {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: "Can I please use your location? :)",
+            message:
+              "I need access!" +
+              "So I know where you are ;)",
+            buttonNeutral: "Ask Me Later",
+            buttonNegative: "Cancel",
+            buttonPositive: "OK"
+          }
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log("You can use the location");
+        } else {
+          console.log("Location permission denied");
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    }
+  };
+  
 
   sendMessage = (message) => {
     //Sending a local notification
@@ -122,18 +186,21 @@ export default class App extends React.Component {
     try {
       console.log('Getting previous location...')
       const jsonValue = await AsyncStorage.getItem('location')
-      this.state.previousLocation = jsonValue != null ? JSON.parse(jsonValue) : null;
-      this.state.hasPreviousLocation = true
+      this.setState({
+        previousLocation: jsonValue != null ? JSON.parse(jsonValue) : null,
+        hasPreviousLocation: true
+      })
       console.log('Got previous location!')
     } catch(e) {
       console.warn(e)
     }
   }
 
+  // Helping function to create delay between the Marks of the route
   sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
-  }
-
+  } 
+  // Going through the route array and checking every marker
   takeRoute = async () => {
     for ( let i = 0; i < this.route.length; i++) {
       this.setState({
@@ -169,45 +236,41 @@ export default class App extends React.Component {
   render() {
     return (
       <View>
-          {/* Displaying Google maps */}
-          <MapView
-            provider={PROVIDER_GOOGLE}
-            style={styles.map}
-            initialRegion={{
-              latitude: 52.127817,
-              longitude: 4.336369,
-              latitudeDelta: 0.009, 
-              longitudeDelta: 0.015,
-            }}>
-            {/* On the map: */}
-            <Polygon coordinates={this.polygon} strokeWidth={2} strokeColor={'red'}/>
-            <Marker title={'Current location'} coordinate={{ latitude : this.state.currentLocation.lat, longitude : this.state.currentLocation.lng }} />
-            {this.state.hasPreviousLocation ? <Marker title={'Previous location'} coordinate={{ latitude : this.state.previousLocation.lat , longitude : this.state.previousLocation.lng }} /> : null}
-          </MapView>
-      <View style={styles.content}>
-        <Button onPress={this.onPressHandler} title='Start Route!'/>
-        {/* <Button onPress={this.storeData} title='Save location'/>
-        <Button onPress={this.getData} title='Load previous locaiton'/> */}
-      </View>
+        {/* Displaying Google maps */}
+        <MapView
+          provider={PROVIDER_GOOGLE}
+          style={styles.map}
+          initialRegion={{
+            latitude: 52.127817,
+            longitude: 4.336369,
+            latitudeDelta: 0.009, 
+            longitudeDelta: 0.015,
+          }}>
+          {/* On the map: */}
+          <Polygon coordinates={this.polygon} strokeWidth={2} strokeColor={'red'}/>
+          <Marker title={'Current location'} coordinate={{ latitude : this.state.currentLocation.lat, longitude : this.state.currentLocation.lng }} />
+          {this.state.hasPreviousLocation ? <Marker title={'Previous location'} coordinate={{ latitude : this.state.previousLocation.lat , longitude : this.state.previousLocation.lng }} /> : null}
+        </MapView>
+        <View style={styles.content}>
+          <Button onPress={this.onPressHandler} title='Start Route!'/>
+          {/* <Button onPress={this.storeData} title='Save location'/>
+          <Button onPress={this.getData} title='Load previous locaiton'/> */}
+        </View>
       </View>
     )
   };
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   map: {
     height: '90%'
   },
-  content: {
+  content: {  
+    height: '10%',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '10%'
+    // flexDirection: "row",
+    // flexWrap: "wrap",
   }
 });
 

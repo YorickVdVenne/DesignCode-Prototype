@@ -1,13 +1,12 @@
 rootProject.name = 'designcode'
-include ':@react-native-async-storage_async-storage'
-project(':@react-native-async-storage_async-storage').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-async-storage/async-storage/android')
-include ':@react-native-async-storage_async-storage'
-project(':@react-native-async-storage_async-storage').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-async-storage/async-storage/android')
-include ':react-native-boundary'
-project(':react-native-boundary').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-boundary/android')
-apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
 include ':app'
+apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
+
+include ':@react-native-async-storage_async-storage'
+project(':@react-native-async-storage_async-storage').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-async-storage/async-storage/android')
+
 include ':react-native-push-notification'
 project(':react-native-push-notification').projectDir = file('../node_modules/react-native-push-notification/android')
+
 include ':react-native-geo-fencing'
 project(':react-native-geo-fencing').projectDir = new File(settingsDir, '../node_modules/react-native-geo-fencing/android')
