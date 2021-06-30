@@ -6,14 +6,14 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, {Component} from 'react';
 import {StyleSheet, View, Text, Button, PermissionsAndroid, AppState } from 'react-native';
 
 import MapView, {PROVIDER_GOOGLE, Marker, Polygon} from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import PushNotification from "react-native-push-notification";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import GeoFencing from 'react-native-geo-fencing';
+import GeoFencing from 'react-native-geo-fencing'; 
 
 export default class App extends React.Component {
   constructor() {
@@ -269,8 +269,6 @@ const styles = StyleSheet.create({
     height: '10%',
     alignItems: 'center',
     justifyContent: 'center',
-    // flexDirection: "row",
-    // flexWrap: "wrap",
   }
 });
 
